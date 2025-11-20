@@ -5,12 +5,14 @@ namespace Goodoneuz\PayUz\Http\Classes\Click;
 use Exception;
 use Goodoneuz\PayUz\Http\Classes\BaseGateway;
 use Goodoneuz\PayUz\Http\Classes\DataFormat;
+use Goodoneuz\PayUz\Http\Classes\GatewayInterface;
 use Goodoneuz\PayUz\Models\PaymentSystem;
 use Goodoneuz\PayUz\Models\Transaction;
 use Goodoneuz\PayUz\Services\PaymentService;
 use Goodoneuz\PayUz\Services\PaymentSystemService;
+use Illuminate\Database\Eloquent\Model;
 
-class Click extends BaseGateway
+class Click extends BaseGateway implements GatewayInterface
 {
     const REQUEST_PREPARE = 0;
     const REQUEST_COMPLATE = 1;
@@ -190,5 +192,15 @@ class Click extends BaseGateway
             'RETURN_URL' => $url,
             'url' => 'https://my.click.uz/pay/'
         ];
+    }
+
+    public function getRedirectUrl(
+        Model $model,
+        float|int $amount,
+        int $currency_code,
+        int $itemAmount,
+        ?string $returnUrl = ''
+    ): string {
+        return '';
     }
 }
