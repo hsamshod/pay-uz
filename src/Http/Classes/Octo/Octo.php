@@ -41,7 +41,7 @@ class Octo extends BaseGateway implements GatewayInterface
 
         $this->merchant->validateRequest($this->request->all());
         if ($this->request->status === 'succeeded') {
-            $transaction = Transaction::where('system_transaction_id', $this->request->shop_transaction_id)->first();
+            $transaction = Transaction::find($this->request->shop_transaction_id);
             if ($transaction) {
                 $transaction->state = Transaction::STATE_COMPLETED;
                 $transaction->update();
@@ -74,6 +74,7 @@ class Octo extends BaseGateway implements GatewayInterface
     ): string {
         try {
             $transaction = Transaction::create([
+                'system_transaction_id' => (int)rand() * 1000,
                 'payment_system' => PaymentSystem::OCTO,
                 'amount' => $amount,
                 'currency_code' => $currency_code,
