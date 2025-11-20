@@ -2,7 +2,8 @@
 
 namespace Goodoneuz\PayUz;
 
-use Illuminate\Support\Facades\View;
+use Goodoneuz\PayUz\Http\Classes\GatewayInterface;
+use Goodoneuz\PayUz\Http\Classes\Octo\Octo;
 use Goodoneuz\PayUz\Models\Transaction;
 use Goodoneuz\PayUz\Models\PaymentSystem;
 use Goodoneuz\PayUz\Http\Classes\Payme\Payme;
@@ -10,11 +11,12 @@ use Goodoneuz\PayUz\Http\Classes\Click\Click;
 use Goodoneuz\PayUz\Http\Classes\Paynet\Paynet;
 use Goodoneuz\PayUz\Http\Classes\Stripe\Stripe;
 use Goodoneuz\PayUz\Http\Classes\PaymentException;
+use Goodoneuz\PayUz\Services\PaymentService;
 
 class PayUz
 {
 
-    protected $driverClass = null;
+    protected GatewayInterface|null $driverClass = null;
 
     /**
      * PayUz constructor.
@@ -29,23 +31,24 @@ class PayUz
      * @param null $driver
      * @return $this
      */
-    public function driver($driver = null)
+    public function driver(?string $driver = null): self
     {
-        switch ($driver) {
-            case PaymentSystem::PAYME:
-                $this->driverClass = new Payme;
-                break;
-            case PaymentSystem::CLICK:
-                $this->driverClass = new Click;
-                break;
-            case PaymentSystem::PAYNET:
-                $this->driverClass = new Paynet;
-                break;
-            case PaymentSystem::STRIPE:
-                $this->driverClass = new Stripe;
-                break;
-        }
+        $this->driverClass = match ($driver) {
+            PaymentSystem::PAYME => new Payme(),
+            PaymentSystem::OCTO => new Octo(),
+            PaymentSystem::CLICK => new Click,
+            PaymentSystem::PAYNET => new Paynet,
+            PaymentSystem::STRIPE => new Stripe,
+        };
+
         return $this;
+    }
+
+    public function redirectUrl($key, $amount, $currency_code = Transaction::CURRENCY_CODE_UZS, $returnUrl = ''): string
+    {
+        $model = PaymentService::convertKeyToModel($key);
+
+        return $this->driverClass->getRedirectUrl($model, $amount, $currency_code, $returnUrl);
     }
 
     /**
@@ -58,7 +61,6 @@ class PayUz
      */
     public function redirect($model, $amount, $currency_code = Transaction::CURRENCY_CODE_UZS, $url = null)
     {
-        $this->validateDriver();
         $driver = $this->driverClass;
         $params = $driver->getRedirectParams($model, $amount, $currency_code, $url);
         $view = 'pay-uz::merchant.index';
@@ -73,7 +75,6 @@ class PayUz
      */
     public function handle()
     {
-        $this->validateDriver();
         try {
             return $this->driverClass->run();
         } catch (PaymentException $e) {
@@ -99,14 +100,6 @@ class PayUz
             throw new \Exception('Currency code can\'t be null');
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function validateDriver()
-    {
-        if (is_null($this->driverClass))
-            throw new \Exception('Driver not selected');
-    }
     public function setDescription($hasDescription)
     {
         $this->driverClass->setDescription($hasDescription);

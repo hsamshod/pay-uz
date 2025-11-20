@@ -2,6 +2,7 @@
 
 namespace Goodoneuz\PayUz\Http\Classes\Stripe;
 
+use Goodoneuz\PayUz\Http\Classes\GatewayInterface;
 use Session;
 use Stripe as StripeGateway;
 use Illuminate\Http\Request;
@@ -14,7 +15,7 @@ use Goodoneuz\PayUz\Models\PaymentSystemParam;
 use Goodoneuz\PayUz\Services\PaymentSystemService;
 use Goodoneuz\PayUz\Http\Classes\PaymentException;
 
-class Stripe extends BaseGateway
+class Stripe extends BaseGateway implements GatewayInterface
 {
     public $config;
     public $request;

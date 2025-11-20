@@ -2,6 +2,7 @@
 
 namespace Goodoneuz\PayUz\Http\Classes\Paynet;
 
+use Goodoneuz\PayUz\Http\Classes\GatewayInterface;
 use Goodoneuz\PayUz\Models\Transaction;
 use Goodoneuz\PayUz\Models\PaymentSystem;
 use Goodoneuz\PayUz\Services\PaymentService;
@@ -10,8 +11,9 @@ use Goodoneuz\PayUz\Http\Classes\BaseGateway;
 use Goodoneuz\PayUz\Models\PaymentSystemParam;
 use Goodoneuz\PayUz\Http\Classes\PaymentException;
 use Goodoneuz\PayUz\Services\PaymentSystemService;
+use Illuminate\Database\Eloquent\Model;
 
-class Paynet extends BaseGateway
+class Paynet extends BaseGateway implements GatewayInterface
 {
     public $config;
     public $request;
@@ -211,5 +213,16 @@ class Paynet extends BaseGateway
     private function getTransactionBySystemTransactionId()
     {
         return Transaction::where('system_transaction_id', $this->request->params['transactionId'])->first();
+    }
+
+    public function getRedirectUrl(
+        Model $model,
+        float|int $amount,
+        int $currency_code,
+        int $itemAmount,
+        ?string $returnUrl = ''
+    ): string {
+        return '';
+        // TODO: Implement getRedirectUrl() method.
     }
 }

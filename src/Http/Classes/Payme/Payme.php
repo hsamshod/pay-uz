@@ -4,16 +4,20 @@ namespace Goodoneuz\PayUz\Http\Classes\Payme;
 
 use Goodoneuz\PayUz\Http\Classes\BaseGateway;
 use Goodoneuz\PayUz\Http\Classes\DataFormat;
+use Goodoneuz\PayUz\Http\Classes\GatewayInterface;
 use Goodoneuz\PayUz\Http\Classes\PaymentException;
 use Goodoneuz\PayUz\Models\PaymentSystem;
 use Goodoneuz\PayUz\Models\PaymentSystemParam;
 use Goodoneuz\PayUz\Models\Transaction;
 use Goodoneuz\PayUz\Services\PaymentService;
 use Goodoneuz\PayUz\Services\PaymentSystemService;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
-class Payme extends BaseGateway
+class Payme extends BaseGateway implements GatewayInterface
 {
+    const CHECKOUT_URL = 'https://checkout.paycom.uz/';
+
     public $config;
     public $request;
     public $response;
@@ -490,5 +494,16 @@ class Payme extends BaseGateway
             $params['account[description]'] = 'Оплата за №'.$model->id;
         }
         return $params;
+    }
+
+    public function getRedirectUrl(Model $model, float|int $amount, int $currency_code, int $itemAmount, ?string $returnUrl = ''): string
+    {
+        $params = 'm=' . $this->config['merchant_id'] .
+            'a=' . $amount * 100 .
+            'ac.user_id=' . $model->id .
+            'ac.type=coins_topup' .
+            'ac.coins=' . $itemAmount . 'l=en';
+
+        return self::CHECKOUT_URL . base64_encode($params);
     }
 }

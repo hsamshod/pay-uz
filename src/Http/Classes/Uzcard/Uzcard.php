@@ -5,13 +5,14 @@ namespace App\Http\Classes;
 use App\Order;
 use App\Transaction;
 use Goodoneuz\PayUz\Http\Classes\BaseGateway;
+use Goodoneuz\PayUz\Http\Classes\GatewayInterface;
 use Goodoneuz\PayUz\Http\Classes\Paycom\Format;
 use Goodoneuz\PayUz\Http\Classes\Paycom\Request;
 use Goodoneuz\PayUz\Http\Classes\Uzcard\Merchant;
 use Goodoneuz\PayUz\Http\Classes\Uzcard\WoywoException;
 
 
-class WoywoController extends BaseGateway
+class WoywoController extends BaseGateway implements GatewayInterface
 {
     public $config;
     public $request;

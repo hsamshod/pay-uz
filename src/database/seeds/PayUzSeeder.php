@@ -14,7 +14,7 @@ class PayUzSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         if (Schema::hasTable('payment_systems')) {
             PaymentSystem::firstOrCreate([
@@ -32,6 +32,10 @@ class PayUzSeeder extends Seeder
             PaymentSystem::firstOrCreate([
                 'name'      => 'Stripe',
                 'system'    => 'stripe'
+            ]);
+            PaymentSystem::firstOrCreate([
+                'name'      => 'Octo',
+                'system'    => 'octo'
             ]);
         }
         if (Schema::hasTable('payment_system_params')) {
@@ -123,6 +127,18 @@ class PayUzSeeder extends Seeder
                 'system'    => 'stripe',
                 'label'     => 'Proxy',
                 'name'      => 'proxy',
+                'value'     => ''
+            ]);
+            PaymentSystemParam::firstOrCreate([
+                'system'    => 'octo',
+                'label'     => 'Shop ID',
+                'name'      => 'shop_id',
+                'value'     => ''
+            ]);
+            PaymentSystemParam::firstOrCreate([
+                'system'    => 'octo',
+                'label'     => 'Secret',
+                'name'      => 'secret',
                 'value'     => ''
             ]);
         }
