@@ -71,7 +71,6 @@ class Octo extends BaseGateway implements GatewayInterface
         float|int $amount,
         int $currency_code,
         int $itemAmount,
-        ?string $returnUrl = ''
     ): string {
         try {
             $transaction = Transaction::create([
@@ -80,7 +79,7 @@ class Octo extends BaseGateway implements GatewayInterface
                 'currency_code' => $currency_code,
                 'state' => Transaction::STATE_CREATED,
                 'updated_time' => DataFormat::timestamp(true),
-                'detail' => compact('amount', 'currency_code', 'itemAmount', 'returnUrl'),
+                'detail' => compact('amount', 'currency_code', 'itemAmount'),
                 'transactionable_type' => get_class($model),
                 'transactionable_id' => $model->id
             ]);

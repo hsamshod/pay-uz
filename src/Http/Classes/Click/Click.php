@@ -199,7 +199,6 @@ class Click extends BaseGateway implements GatewayInterface
         float|int $amount,
         int $currency_code,
         int $itemAmount,
-        ?string $returnUrl = ''
     ): string {
         return '';
     }
