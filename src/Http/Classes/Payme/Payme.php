@@ -28,7 +28,7 @@ class Payme extends BaseGateway
         $this->config = PaymentSystemService::getPaymentSystemParamsCollect(PaymentSystem::PAYME);
     }
 
-    public function run()
+    public function run(): void
     {
         $this->response = new Response();
         $this->request = new Request($this->response);

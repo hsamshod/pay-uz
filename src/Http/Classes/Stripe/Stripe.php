@@ -36,7 +36,7 @@ class Stripe extends BaseGateway
      *
      * @return \Illuminate\Http\Response
      */
-    public function run()
+    public function run(): void
     {
         StripeGateway\Stripe::setApiKey($this->config['secret_key']);
         if (!empty($this->config['proxy'])) {

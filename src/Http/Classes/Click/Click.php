@@ -28,7 +28,7 @@ class Click extends BaseGateway
     }
 
 
-    public function run()
+    public function run(): void
     {
         $required_fields = [
             'click_trans_id', 'service_id',

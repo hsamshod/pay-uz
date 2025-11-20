@@ -9,8 +9,9 @@ use Goodoneuz\PayUz\Classes\Oson\Merchant;
 use Goodoneuz\PayUz\Classes\Paycom\Request;
 use Goodoneuz\PayUz\Http\Classes\BaseGateway;
 use Goodoneuz\PayUz\Classes\Oson\OsonException;
+use Goodoneuz\PayUz\Http\Classes\GatewayInterface;
 
-class Oson extends BaseGateway
+class Oson extends BaseGateway implements GatewayInterface
 {
     public $config;
     public $request;
@@ -34,7 +35,8 @@ class Oson extends BaseGateway
     /**
      *
      */
-    public function run(){
+    public function run(): void
+    {
         try {
             $this->merchant->checkAuth();
             switch ($this->request['method']) {

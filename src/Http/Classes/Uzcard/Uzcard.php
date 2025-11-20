@@ -28,7 +28,8 @@ class WoywoController extends BaseGateway
         $this->request  = json_decode($request_body, true);
         $this->merchant = new Merchant($this->config);
     }
-    public function run(){
+    public function run(): void
+    {
         try {
             switch ($this->request['billType']) {
                 case 'CHECK':
@@ -41,7 +42,7 @@ class WoywoController extends BaseGateway
                     throw new WoywoException(WoywoException::ERROR_METHOD_NOT_FOUND);
 
             }
-        }catch (WoywoException $exception){
+        } catch (WoywoException $exception){
             $exception->send();
         }
     }

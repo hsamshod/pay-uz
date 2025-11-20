@@ -25,7 +25,7 @@ class Paynet extends BaseGateway
         $this->response->setRequest($this->request);
         $this->merchant = new Merchant($this->config, $this->request, $this->response);
     }
-    public function run()
+    public function run(): void
     {
         $this->merchant->Authorize();
         switch ($this->request->params['method']) {
