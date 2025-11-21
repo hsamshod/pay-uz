@@ -16,7 +16,7 @@ use Illuminate\Support\Carbon;
 
 class Payme extends BaseGateway implements GatewayInterface
 {
-    const CHECKOUT_URL = 'https://checkout.paycom.uz/';
+    const CHECKOUT_URL = 'https://checkout.paycom.uz';
 
     public $config;
     public $request;
@@ -499,11 +499,11 @@ class Payme extends BaseGateway implements GatewayInterface
     public function getRedirectUrl(Model $model, float|int $amount, int $currency_code, int $itemAmount): string
     {
         $params = 'm=' . $this->config['merchant_id'] .
-            'a=' . $amount * 100 .
-            'ac.user_id=' . $model->id .
-            'ac.type=coins_topup' .
-            'ac.coins=' . $itemAmount . 'l=en';
+            '&a=' . $amount * 100 .
+            '&ac.user_id=' . $model->id .
+            '&ac.type=coins_topup' .
+            '&ac.coins=' . $itemAmount . 'l=en';
 
-        return self::CHECKOUT_URL . base64_encode($params);
+        return self::CHECKOUT_URL .'/' . base64_encode($params);
     }
 }
