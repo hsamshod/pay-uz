@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Click extends BaseGateway implements GatewayInterface
 {
+    const CHECKOUT_URL = 'https://my.click.uz/services/pay';
+
     const REQUEST_PREPARE = 0;
     const REQUEST_COMPLATE = 1;
     private $config;
@@ -200,6 +202,12 @@ class Click extends BaseGateway implements GatewayInterface
         int $currency_code,
         int $itemAmount,
     ): string {
-        return '';
+        $params = 'service_id=' . $this->config['service_id'] .
+        '&merchant_id=' . $this->config['merchant_id'] .
+        '&amount=' . $amount .
+        '&transaction_param=' . $model->id .
+        '&return_url=' . config('payuz')['return_url'];
+
+        return self::CHECKOUT_URL . '?' . $params;
     }
 }
