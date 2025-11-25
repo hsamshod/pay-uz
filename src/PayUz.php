@@ -48,7 +48,7 @@ class PayUz
     {
         $model = PaymentService::convertKeyToModel($key);
 
-        return $this->driverClass->getRedirectUrl($model, $amount, $currency_code, $itemAmount);
+        return $this->driverClass->getRedirectUrl($model, $amount, $itemAmount, $currency_code);
     }
 
     /**

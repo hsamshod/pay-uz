@@ -496,7 +496,7 @@ class Payme extends BaseGateway implements GatewayInterface
         return $params;
     }
 
-    public function getRedirectUrl(Model $model, float|int $amount, int $currency_code, int $itemAmount): string
+    public function getRedirectUrl(Model $model, float|int $amount, int $itemAmount, int $currency_code): string
     {
         $params = 'm=' . $this->config['merchant_id'] .
             '&a=' . $amount * 100 .

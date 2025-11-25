@@ -69,12 +69,12 @@ class Octo extends BaseGateway implements GatewayInterface
     public function getRedirectUrl(
         Model $model,
         float|int $amount,
-        int $currency_code,
         int $itemAmount,
+        int $currency_code,
     ): string {
         try {
             $transaction = Transaction::create([
-                'system_transaction_id' => (int)rand() * 1000,
+                'system_transaction_id' => (int) mt_rand() * 1000,
                 'payment_system' => PaymentSystem::OCTO,
                 'amount' => $amount,
                 'currency_code' => $currency_code,

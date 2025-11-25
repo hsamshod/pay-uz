@@ -218,8 +218,8 @@ class Paynet extends BaseGateway implements GatewayInterface
     public function getRedirectUrl(
         Model $model,
         float|int $amount,
-        int $currency_code,
-        int $itemAmount
+        int $itemAmount,
+        int $currency_code
     ): string {
         return '';
         // TODO: Implement getRedirectUrl() method.
