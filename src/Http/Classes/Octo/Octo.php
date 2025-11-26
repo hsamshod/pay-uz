@@ -37,8 +37,6 @@ class Octo extends BaseGateway implements GatewayInterface
 
     public function run(): void
     {
-        Log::info('Octo notification', $this->request->all());
-
         // $this->merchant->validateRequest($this->request->all()); @todo
         if ($this->request->status === 'succeeded') {
             /* @var Transaction $transaction */
@@ -70,7 +68,7 @@ class Octo extends BaseGateway implements GatewayInterface
             'octo_secret' => $this->config['secret'],
             'shop_transaction_id' => $transactionId,
             'auto_capture' => true,
-            'test' => !app()->isProduction(),
+            'test' => true,
             'total_sum' => $amount,
             'currency' => $currency,
             'description' => 'Account top-up for #' . $model->id,
