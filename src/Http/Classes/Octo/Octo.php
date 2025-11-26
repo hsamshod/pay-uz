@@ -75,6 +75,7 @@ class Octo extends BaseGateway implements GatewayInterface
             'currency' => $currency,
             'description' => 'Account top-up for #' . $model->id,
             'return_url' => config('payuz')['return_url'],
+            'notify_url' => config('payuz')['octo_webhook_url'],
         ];
     }
 
@@ -98,6 +99,7 @@ class Octo extends BaseGateway implements GatewayInterface
             ]);
 
             $params = $this->getRedirectParams($model, $amount, $currency_code === Transaction::CURRENCY_CODE_USD ? 'USD' : 'UZS', $transaction->id);
+            $params['init_time'] = now()->toDateTimeString();
 
             $response = Http::asJson()->timeout(5)->post(self::CHECKOUT_URL, $params);
             $response->throw();
