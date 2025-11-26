@@ -43,7 +43,9 @@ class Octo extends BaseGateway implements GatewayInterface
             $transaction = Transaction::find($this->request->shop_transaction_id);
             if ($transaction && $transaction->amount == $this->request->total_sum) {
                 $transaction->state = Transaction::STATE_COMPLETED;
-                $transaction->detail['response'] = $this->request->all();
+                $detail = $transaction->detail;
+                $detail['response'] = $this->request->all();
+                $transaction->detail = $detail;
                 $transaction->update();
 
                 PaymentService::payListener(null, $transaction, 'after-pay');
