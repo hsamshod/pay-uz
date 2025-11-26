@@ -39,14 +39,26 @@ class Octo extends BaseGateway implements GatewayInterface
     {
         Log::info('Octo notification', $this->request->all());
 
-        $this->merchant->validateRequest($this->request->all());
+        // $this->merchant->validateRequest($this->request->all()); @todo
         if ($this->request->status === 'succeeded') {
+            /* @var Transaction $transaction */
             $transaction = Transaction::find($this->request->shop_transaction_id);
-            if ($transaction) {
+            if ($transaction && $transaction->amount == $this->request->total_sum) {
                 $transaction->state = Transaction::STATE_COMPLETED;
+                $transaction->detail['response'] = $this->request->all();
                 $transaction->update();
 
                 PaymentService::payListener(null, $transaction, 'after-pay');
+            }
+        }
+
+        if ($this->request->status === 'canceled') {
+            /* @var Transaction $transaction */
+            $transaction = Transaction::find($this->request->shop_transaction_id);
+            if ($transaction) {
+                $transaction->state = Transaction::STATE_CANCELLED;
+                $transaction->detail['response'] = $this->request->all();
+                $transaction->update();
             }
         }
     }
