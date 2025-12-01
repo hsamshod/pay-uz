@@ -62,6 +62,10 @@ class Click extends BaseGateway implements GatewayInterface
     {
         $arr = $this->request->all();
 
+        if (!isset($arr['action'])) {
+            return false;
+        }
+
         if ($arr['action'] == self::REQUEST_COMPLATE)
             $fields[] = 'merchant_prepare_id';
 
