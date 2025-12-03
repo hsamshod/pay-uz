@@ -25,7 +25,7 @@ class Paylov extends BaseGateway implements GatewayInterface
 
     public function __construct()
     {
-        $this->config = PaymentSystemService::getPaymentSystemParamsCollect(PaymentSystem::CLICK);
+        $this->config = PaymentSystemService::getPaymentSystemParamsCollect(PaymentSystem::PAYLOV);
         $this->request = request();
         $this->response = new Response();
         $this->merchant = new Merchant($this->response);
@@ -181,23 +181,7 @@ class Paylov extends BaseGateway implements GatewayInterface
 
     public function getRedirectParams($model, $amount, $currency, $url)
     {
-        $time = date('Y-m-d H:i:s', time());
-        $sign = md5($time . $this->config['secret_key'] .
-            $this->config['service_id'] . $amount);
-        return [
-            'MERCHANT_TRANS_AMOUNT' => $amount,
-            'MERCHANT_ID' => $this->config['merchant_id'],
-            'MERCHANT_USER_ID' => $this->config['merchant_user_id'],
-            'MERCHANT_SERVICE_ID' => $this->config['service_id'],
-            'MERCHANT_TRANS_ID' => PaymentService::convertModelToKey($model),
-            'MERCHANT_TRANS_NOTE' => '',
-            'MERCHANT_USER_PHONE' => '',
-            'MERCHANT_USER_EMAIL' => '',
-            'SIGN_TIME' => $time,
-            'SIGN_STRING' => $sign,
-            'RETURN_URL' => $url,
-            'url' => 'https://my.click.uz/pay/'
-        ];
+        return [];
     }
 
     public function getRedirectUrl(
