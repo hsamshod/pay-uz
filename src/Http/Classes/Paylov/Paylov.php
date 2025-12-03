@@ -66,7 +66,10 @@ class Paylov extends BaseGateway implements GatewayInterface
         }
 
         $transaction = (object)['amount' => $data['params']['amount']];
-        PaymentService::payListener($model, $transaction, 'paying');
+        if (!PaymentService::payListener($model, $transaction, 'paying')) {
+            $this->response->setResult(Response::INVALID_AMOUNT, 'Invalid amount');
+            return false;
+        }
 
         return true;
     }
