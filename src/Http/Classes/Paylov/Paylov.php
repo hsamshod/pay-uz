@@ -73,7 +73,7 @@ class Paylov extends BaseGateway implements GatewayInterface
 
     private function perform(array $data = []): bool
     {
-        if ($this->check($data)) {
+        if (!$this->check($data)) {
             return false;
         }
 
