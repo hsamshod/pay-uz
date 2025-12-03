@@ -33,7 +33,7 @@ class Paylov extends BaseGateway implements GatewayInterface
 
     public function run(): void
     {
-        $data = $this->request->json();
+        $data = $this->request->json()->all();
         switch ($data['method'] ?? '') {
             case self::CHECK_METHOD:
                 $this->check($data);
