@@ -48,7 +48,7 @@ class Paylov extends BaseGateway implements GatewayInterface
         $this->response->send();
     }
 
-    private function check(array $data = []): void
+    private function check(array $data = []): bool
     {
         $id = $data['params']['account']['id'] ?? null;
 
@@ -56,7 +56,7 @@ class Paylov extends BaseGateway implements GatewayInterface
 
         if (!$model) {
             $this->response->setResult(Response::SMTH_WENT_WRONG, 'Invalid account.id');
-            return;
+            return false;
         }
 
         PaymentService::payListener($model, 1 * ($data['params']['amount']), 'before-pay');
@@ -67,11 +67,16 @@ class Paylov extends BaseGateway implements GatewayInterface
 
         $transaction = (object)['amount' => $data['params']['amount']];
         PaymentService::payListener($model, $transaction, 'paying');
+
+        return true;
     }
 
-    private function perform(array $data = [])
+    private function perform(array $data = []): bool
     {
-        $this->check($data);
+        if ($this->check($data)) {
+            return false;
+        }
+
         $id = $data['params']['account']['id'] ?? null;
         $model = PaymentService::convertKeyToModel($id);
         $create_time = DataFormat::timestamp(true);
@@ -91,6 +96,7 @@ class Paylov extends BaseGateway implements GatewayInterface
         PaymentService::payListener(null, $transaction, 'after-pay');
 
         PaymentService::beforeResponse("Paylov@Complete", $data['params'], []);
+        return true;
     }
 
     public function getRedirectParams($model, $amount, $currency, $url)
