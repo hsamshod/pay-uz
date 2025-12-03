@@ -27,7 +27,7 @@ class Response
             'id' => random_int(100_000, 900_000),
             'result' => [
                 'status' => $this->status,
-                'statusText' => $this->message,
+                'statusText' => $this->statusText,
             ],
         ];
 
