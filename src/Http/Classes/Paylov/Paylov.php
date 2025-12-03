@@ -14,10 +14,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Paylov extends BaseGateway implements GatewayInterface
 {
-    const CHECKOUT_URL = 'https://my.paylov.uz/checkout/create';
-
-    const REQUEST_PREPARE = 0;
-    const REQUEST_COMPLATE = 1;
+    private const CHECKOUT_URL = 'https://my.paylov.uz/checkout/create';
+    private const CHECK_METHOD = 'transaction.check';
+    private const PERFORM_METHOD = 'transaction.perform';
     private $config;
     private $merchant;
     private $request;
@@ -34,149 +33,64 @@ class Paylov extends BaseGateway implements GatewayInterface
 
     public function run(): void
     {
-        $required_fields = [
-            'click_trans_id', 'service_id',
-            'click_paydoc_id', 'merchant_trans_id',
-            'amount', 'action', 'error', 'error_note',
-            'sign_time', 'sign_string'
-        ];
-
-        $res = $this->check_for_required_field($required_fields);
-        if (!$res) {
-            $this->response->setResult(Response::ERROR_REQUEST_FROM);
-        }
-        $this->merchant->validateRequest($this->request->all());
-        switch ($this->request->all()['action']) {
-            case self::REQUEST_PREPARE:
-                $this->Prepare();
+        $data = $this->request->json();
+        switch ($data['method'] ?? '') {
+            case self::CHECK_METHOD:
+                $this->check($data);
                 break;
-            case self::REQUEST_COMPLATE:
-                $this->Complete();
+            case self::PERFORM_METHOD:
+                $this->perform($data);
                 break;
             default:
-                $this->response->setResult(Response::ERROR_ACTION_NOT_FOUND);
-        }
-    }
-
-    private function check_for_required_field($fields)
-    {
-        $arr = $this->request->all();
-
-        if (!isset($arr['action'])) {
-            return false;
+                $this->response->setResult(Response::SMTH_WENT_WRONG, 'Invalid Method');
         }
 
-        if ($arr['action'] == self::REQUEST_COMPLATE)
-            $fields[] = 'merchant_prepare_id';
-
-        foreach ($fields as $field)
-            if (!array_key_exists($field, $arr)) {
-                echo $field;
-                return false;
-            }
-
-        return true;
+        $this->response->send();
     }
 
-    private function Prepare()
+    private function check(array $data = []): void
     {
-        $params = $this->request->all();
+        $id = $data['params']['account']['id'] ?? null;
 
-        $response = [
-            'merchant_prepare_id' => null,
-            'click_trans_id' => null,
-            'merchant_trans_id' => null
-        ];
+        $model = PaymentService::convertKeyToModel($id);
 
-        $model = PaymentService::convertKeyToModel($this->request['merchant_trans_id']);
+        if (!$model) {
+            $this->response->setResult(Response::SMTH_WENT_WRONG, 'Invalid account.id');
+            return;
+        }
 
-        if (!$model)
-            $this->response->setResult(Response::ERROR_ORDER_NOT_FOUND);
+        PaymentService::payListener($model, 1 * ($data['params']['amount']), 'before-pay');
 
-        PaymentService::payListener($model, 1 * ($this->request->amount), 'before-pay');
+        if (!PaymentService::isProperModelAndAmount($model, $data['params']['amount'])) {
+            $this->response->setResult(Response::INVALID_AMOUNT, 'Amount check failed');
+        }
 
-        if (!PaymentService::isProperModelAndAmount($model, $params['amount']))
-            $this->response->setResult(Response::ERROR_INVALID_AMOUNT);
-        $response['click_trans_id'] = $params['click_trans_id'];
-        $response['merchant_trans_id'] = $params['merchant_trans_id'];
-
-        $create_time = DataFormat::timestamp(true);
-
-        $detail = array(
-            'create_time' => $create_time,
-            'system_time_datetime' => DataFormat::timestamp2datetime($params['sign_time'])
-        );
-
-        $transaction = Transaction::create([
-            'payment_system' => PaymentSystem::CLICK,
-            'system_transaction_id' => $params['click_trans_id'],
-            'amount' => $params['amount'],
-            'currency_code' => Transaction::CURRENCY_CODE_UZS,
-            'state' => Transaction::STATE_CREATED,
-            'updated_time' => 1 * $create_time,
-            'comment' => $params['error_note'],
-            'detail' => $detail,
-            'transactionable_type' => get_class($model),
-            'transactionable_id' => $model->id
-        ]);
-
-        $response['merchant_prepare_id'] = $transaction->id;
+        $transaction = (object)['amount' => $data['params']['amount']];
         PaymentService::payListener($model, $transaction, 'paying');
-
-        $response = PaymentService::beforeResponse("Click@Prepare", $params, $response);
-        
-        $this->response->setResult(Response::SUCCESS, $response);
     }
 
-    private function Complete()
+    private function perform(array $data = [])
     {
-        $params = $this->request->all();
-
-        $response = [
-            'click_trans_id' => $params['click_trans_id'],
-            'merchant_trans_id' => $params['merchant_trans_id'],
-            'merchant_confirm_id' => null
-        ];
-        $transaction = null;
-        try {
-            $transaction = Transaction::find($params['merchant_prepare_id']);
-        } catch (Exception $e) {
-        }
-        if (!$transaction)
-            $this->response->setResult(Response::ERROR_TRANSACTION_NOT_FOUND);
-
-        if ($params['error'] == -1) {
-            $response['error_note'] = $params['error_note'];
-            $this->response->setResult(Response::ERROR_ALREADY_PAID);
-        }
-
-        if ($params['error'] == -5017) {
-            $response['error_note'] = $params['error_note'];
-            $transaction->state = Transaction::STATE_CANCELLED;
-            $transaction->update();
-            $this->response->setResult(Response::ERROR_TRANSACTION_CANCELLED);
-        }
-
-        if ($transaction->state == Transaction::STATE_CANCELLED)
-            $this->response->setResult(Response::ERROR_TRANSACTION_CANCELLED);
-
-        if ($transaction->state != Transaction::STATE_CREATED)
-            $this->response->setResult(Response::ERROR_ALREADY_PAID);
-
-        if ($transaction->amount != $params['amount']) {
-            $this->response->setResult(Response::ERROR_INVALID_AMOUNT);
-        }
-
-        $transaction->state = Transaction::STATE_COMPLETED;
-        $transaction->update();
-
-        $response['merchant_confirm_id'] = $transaction->id;
+        $this->check($data);
+        $id = $data['params']['account']['id'] ?? null;
+        $model = PaymentService::convertKeyToModel($id);
+        $create_time = DataFormat::timestamp(true);
+        $transaction = Transaction::create([
+            'payment_system' => PaymentSystem::PAYLOV,
+            'system_transaction_id' => $data['params']['transaction_id'],
+            'amount' => $data['params']['amount'],
+            'currency_code' => Transaction::CURRENCY_CODE_UZS,
+            'state' => Transaction::STATE_COMPLETED,
+            'updated_time' => 1 * $create_time,
+            'comment' => '',
+            'detail' => $data,
+            'transactionable_type' => get_class($model),
+            'transactionable_id' => $model->id,
+        ]);
 
         PaymentService::payListener(null, $transaction, 'after-pay');
 
-        $response = PaymentService::beforeResponse("Click@Complete", $params, $response);
-
-        $this->response->setResult(Response::SUCCESS, $response);
+        PaymentService::beforeResponse("Paylov@Complete", $data['params'], []);
     }
 
     public function getRedirectParams($model, $amount, $currency, $url)
@@ -192,7 +106,7 @@ class Paylov extends BaseGateway implements GatewayInterface
     ): string {
         $params = 'merchant_id=' . $this->config['merchant_id'] .
             '&amount=' . $amount .
-            '&account.order_id=' . $model->id .
+            '&account.id=' . $model->id .
             '&return_url=' . config('payuz')['return_url'];
 
         return self::CHECKOUT_URL . '/' . base64_encode($params);
