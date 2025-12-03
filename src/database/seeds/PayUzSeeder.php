@@ -37,6 +37,10 @@ class PayUzSeeder extends Seeder
                 'name'      => 'Octo',
                 'system'    => 'octo'
             ]);
+            PaymentSystem::firstOrCreate([
+                'name'      => 'Paylov',
+                'system'    => 'paylov'
+            ]);
         }
         if (Schema::hasTable('payment_system_params')) {
             //Paycom
@@ -139,6 +143,18 @@ class PayUzSeeder extends Seeder
                 'system'    => 'octo',
                 'label'     => 'Secret',
                 'name'      => 'secret',
+                'value'     => ''
+            ]);
+            PaymentSystemParam::firstOrCreate([
+                'system'    => 'paylov',
+                'label'     => 'Merchant ID',
+                'name'      => 'merchant_id',
+                'value'     => ''
+            ]);
+            PaymentSystemParam::firstOrCreate([
+                'system'    => 'paylov',
+                'label'     => 'API Key',
+                'name'      => 'api_key',
                 'value'     => ''
             ]);
         }

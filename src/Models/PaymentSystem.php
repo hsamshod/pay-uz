@@ -18,6 +18,7 @@ class PaymentSystem extends Model
     const ACTIVE = 'active';
 
     const PAYME     = 'payme';
+    const PAYLOV    = 'paylov';
     const CLICK     = 'click';
     const UPAY      = 'upay';
     const UZCARD    = 'uzcard';

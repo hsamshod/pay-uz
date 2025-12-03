@@ -2,6 +2,7 @@
 
 namespace Goodoneuz\PayUz;
 
+use Goodoneuz\PayUz\Http\Classes\Paylov\Paylov;
 use Goodoneuz\PayUz\Http\Classes\GatewayInterface;
 use Goodoneuz\PayUz\Http\Classes\Octo\Octo;
 use Goodoneuz\PayUz\Models\Transaction;
@@ -35,6 +36,7 @@ class PayUz
     {
         $this->driverClass = match ($driver) {
             PaymentSystem::PAYME => new Payme(),
+            PaymentSystem::PAYLOV => new Paylov(),
             PaymentSystem::OCTO => new Octo(),
             PaymentSystem::CLICK => new Click,
             PaymentSystem::PAYNET => new Paynet,
