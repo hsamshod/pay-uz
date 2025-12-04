@@ -16,4 +16,5 @@ return [
     'multi_transaction' => true,
     'return_url' => '/',
     'octo_webhook_url' => '/',
+    'test_mode' => true,
 ];

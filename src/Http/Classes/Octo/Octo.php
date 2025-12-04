@@ -70,7 +70,7 @@ class Octo extends BaseGateway implements GatewayInterface
             'octo_secret' => $this->config['secret'],
             'shop_transaction_id' => $transactionId,
             'auto_capture' => true,
-            'test' => true,
+            'test' => config('payuz')['test_mode'] ?? true,
             'total_sum' => $amount,
             'currency' => $currency,
             'description' => 'Account top-up for #' . $model->id,
