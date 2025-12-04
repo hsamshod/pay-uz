@@ -50,7 +50,7 @@ class Paylov extends BaseGateway implements GatewayInterface
 
     private function check(array $data = []): bool
     {
-        $id = $data['params']['account']['id'] ?? null;
+        $id = $data['params']['account']['order_id'] ?? null;
 
         $model = PaymentService::convertKeyToModel($id);
 
@@ -77,7 +77,7 @@ class Paylov extends BaseGateway implements GatewayInterface
             return false;
         }
 
-        $id = $data['params']['account']['id'] ?? null;
+        $id = $data['params']['account']['order_id'] ?? null;
         $model = PaymentService::convertKeyToModel($id);
         $create_time = DataFormat::timestamp(true);
         $transaction = Transaction::create([
@@ -112,7 +112,7 @@ class Paylov extends BaseGateway implements GatewayInterface
     ): string {
         $params = 'merchant_id=' . $this->config['merchant_id'] .
             '&amount=' . $amount .
-            '&account.id=' . $model->id .
+            '&account.order_id=' . $model->id .
             '&return_url=' . config('payuz')['return_url'];
 
         return self::CHECKOUT_URL . '/' . base64_encode($params);
