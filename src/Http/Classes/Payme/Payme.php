@@ -502,7 +502,7 @@ class Payme extends BaseGateway implements GatewayInterface
             '&a=' . $amount * 100 .
             '&ac.user_id=' . $model->id .
             '&ac.type=coins_topup' .
-            '&ac.coins=' . $itemAmount . 'l=en';
+            '&ac.coins=' . $itemAmount . '&l=en';
 
         return self::CHECKOUT_URL .'/' . base64_encode($params);
     }
