@@ -499,10 +499,11 @@ class Payme extends BaseGateway implements GatewayInterface
     public function getRedirectUrl(Model $model, float|int $amount, int $itemAmount, int $currency_code): string
     {
         $params = 'm=' . $this->config['merchant_id'] .
-            '&a=' . $amount * 100 .
-            '&ac.user_id=' . $model->id .
-            '&ac.type=coins_topup' .
-            '&ac.coins=' . $itemAmount . '&l=en';
+            ';a=' . $amount * 100 .
+            ';ac.user_id=' . $model->id .
+            ';l=ru' .
+            ';c=' . config('payuz')['return_url'];
+
 
         return self::CHECKOUT_URL .'/' . base64_encode($params);
     }
