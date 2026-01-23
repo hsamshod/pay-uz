@@ -471,7 +471,7 @@ class Payme extends BaseGateway implements GatewayInterface
                 'cancel_time' => $detail['cancel_time'] ?? 0,
                 'transaction' => (string) $row['id'],
                 'state' => 1 * $row['state'],
-                'reason' => empty($row['comment']) ? null : $row['comment'],
+                'reason' => empty($row['comment']) ? null : (is_numeric($row['comment']) ? ((int) $row['comment']) : $row['comment']),
                 'receivers' => isset($row['receivers']) ? json_decode($row['receivers'], true) : null,
             ];
         })->toArray();
