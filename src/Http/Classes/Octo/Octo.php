@@ -84,6 +84,7 @@ class Octo extends BaseGateway implements GatewayInterface
         float|int $amount,
         int $itemAmount,
         int $currency_code,
+        bool $withReturnUrl = true
     ): string {
         try {
             $transaction = Transaction::create([

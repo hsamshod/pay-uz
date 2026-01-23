@@ -109,6 +109,7 @@ class Paylov extends BaseGateway implements GatewayInterface
         float|int $amount,
         int $itemAmount,
         int $currency_code,
+        bool $withReturnUrl = true
     ): string {
         $params = 'merchant_id=' . $this->config['merchant_id'] .
             '&amount=' . $amount .

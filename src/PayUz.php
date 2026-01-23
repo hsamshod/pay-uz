@@ -46,11 +46,11 @@ class PayUz
         return $this;
     }
 
-    public function redirectUrl($key, $amount, $itemAmount = 0, $currency_code = Transaction::CURRENCY_CODE_UZS): string
+    public function redirectUrl($key, $amount, $itemAmount = 0, $currency_code = Transaction::CURRENCY_CODE_UZS, bool $withReturnUrl = true): string
     {
         $model = PaymentService::convertKeyToModel($key);
 
-        return $this->driverClass->getRedirectUrl($model, $amount, $itemAmount, $currency_code);
+        return $this->driverClass->getRedirectUrl($model, $amount, $itemAmount, $currency_code, $withReturnUrl);
     }
 
     /**

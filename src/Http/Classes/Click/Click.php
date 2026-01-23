@@ -205,12 +205,16 @@ class Click extends BaseGateway implements GatewayInterface
         float|int $amount,
         int $itemAmount,
         int $currency_code,
+        bool $withReturnUrl = true
     ): string {
         $params = 'service_id=' . $this->config['service_id'] .
         '&merchant_id=' . $this->config['merchant_id'] .
         '&amount=' . $amount .
-        '&transaction_param=' . $model->id .
-        '&return_url=' . config('payuz')['return_url'];
+        '&transaction_param=' . $model->id;
+
+        if ($withReturnUrl) {
+            $params .= '&return_url=' . config('payuz')['return_url'];
+        }
 
         return self::CHECKOUT_URL . '?' . $params;
     }

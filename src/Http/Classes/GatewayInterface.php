@@ -10,5 +10,5 @@ interface GatewayInterface
 {
     public function run(): void;
 
-    public function getRedirectUrl(Model $model, float|int $amount, int $itemAmount, int $currency_code): string;
+    public function getRedirectUrl(Model $model, float|int $amount, int $itemAmount, int $currency_code, bool $withReturnUrl = true): string;
 }
