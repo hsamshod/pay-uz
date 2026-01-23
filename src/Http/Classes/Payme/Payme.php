@@ -453,7 +453,7 @@ class Payme extends BaseGateway implements GatewayInterface
         $to_date = Carbon::createFromTimestamp($to_date / 1000)->format('Y-m-d H:i:s');
 
         $transactions = Transaction::where('payment_system', PaymentSystem::PAYME)
-            ->where('state', Transaction::STATE_COMPLETED)
+           // ->where('state', Transaction::STATE_COMPLETED)
             ->whereBetween('created_at', [$from_date, $to_date])
             ->get();
 
