@@ -92,7 +92,7 @@ class Payme extends BaseGateway implements GatewayInterface
         }
 
         $active_transactions = $this->getActiveTransactions($model);
-        if ((count($active_transactions) > 0)) {
+        if ((count($active_transactions) > 0) && !config('payuz')['multi_transaction']) {
             $this->response->error(
                 Response::ERROR_INVALID_TRANSACTION,
                 'There is other active transaction for this object.'
